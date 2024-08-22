@@ -1,0 +1,43 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+/dist
+.env
+
+# Testing
+/coverage/
+
+# Production
+/build/
+
+# Misc
+.DS_Store
+*.log
+*.lock
+
+# Editor directories and files
+.vscode/
+
+# Babel cache
+.babelrc
+.babelrc.js
+.babelrc.json
+.babelrc.config.js
+
+# MacOS files
+.DS_Store
+
+# Jest
+/jest
+/junit.xml
+
+# Optional npm cache directory
+.npm
+
+# Ignore all test directories except __tests__
+__tests__/
+!src/__tests__/
+
+# IDE/Editor config
+/.vscode/
