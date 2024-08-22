@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { fetchFruits } from "../utils/services";
+import { getComboboxProps } from "../utils/accessibility";
 
 const TypeAheadSearch = () => {
 	const [query, setQuery] = useState("");
 	const [suggestions, setSuggestions] = useState([]);
+	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [activeIndex, setActiveIndex] = useState(-1);
+	const suggestionsRef = useRef(null);
 
 	useEffect(() => {
 		const getSuggestions = async () => {
@@ -27,12 +31,20 @@ const TypeAheadSearch = () => {
 					placeholder='Search fruits...'
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
-					aria-autocomplete='list'
-					role='combobox'
-					aria-controls='suggestions-list'
-					aria-expanded={true} //need to add suggestion list
+					onBlur={() =>
+						setTimeout(() => setShowSuggestions(false), 100)
+					}
+					onFocus={() => query.length > 0 && setShowSuggestions(true)}
+					{...getComboboxProps(query, activeIndex, showSuggestions)}
 				/>
-				<ul id='suggestions-list'></ul>
+				{console.log(showSuggestions)}
+				{showSuggestions && suggestions.length > 0 && (
+					<ul id='suggestions-list' ref={suggestionsRef}>
+						{suggestions.map((suggestion, index) => (
+							<li key={index}>{suggestion}</li>
+						))}
+					</ul>
+				)}
 			</div>
 		</div>
 	);
