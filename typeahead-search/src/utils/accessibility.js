@@ -7,3 +7,13 @@ export const getComboboxProps = (query, activeIndex, showSuggestions) => ({
 	"aria-expanded": showSuggestions,
 	"aria-haspopup": "listbox",
 });
+export const getOptionProps = (index, activeIndex) => ({
+	id: `suggestion-${index}`,
+	role: "option",
+	"aria-selected": index === activeIndex,
+});
+
+export const getListboxProps = () => ({
+	id: "suggestions-list",
+	role: "listbox",
+});

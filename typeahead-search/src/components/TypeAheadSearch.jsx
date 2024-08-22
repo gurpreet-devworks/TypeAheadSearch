@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { fetchFruits } from "../utils/services";
-import { getComboboxProps } from "../utils/accessibility";
+import {
+	getComboboxProps,
+	getListboxProps,
+	getOptionProps,
+} from "../utils/accessibility";
 
 const TypeAheadSearch = () => {
 	const [query, setQuery] = useState("");
@@ -39,9 +43,20 @@ const TypeAheadSearch = () => {
 				/>
 				{console.log(showSuggestions)}
 				{showSuggestions && suggestions.length > 0 && (
-					<ul id='suggestions-list' ref={suggestionsRef}>
+					<ul
+						id='suggestions-list'
+						className='list-group position-absolute w-100 shadow-sm mt-1'
+						ref={suggestionsRef}
+						{...getListboxProps()}>
 						{suggestions.map((suggestion, index) => (
-							<li key={index}>{suggestion}</li>
+							<li
+								key={index}
+								className={`list-group-item list-group-item-action ${
+									index === activeIndex ? "active" : ""
+								}`}
+								{...getOptionProps}>
+								{suggestion}
+							</li>
 						))}
 					</ul>
 				)}
