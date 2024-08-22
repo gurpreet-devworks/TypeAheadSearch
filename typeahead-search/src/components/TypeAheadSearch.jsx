@@ -1,8 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { fetchFruits } from "../utils/services";
 
 const TypeAheadSearch = () => {
 	const [query, setQuery] = useState("");
 	const [suggestions, setSuggestions] = useState([]);
+
+	useEffect(() => {
+		const getSuggestions = async () => {
+			if (query.length > 0) {
+				const results = await fetchFruits(query);
+				setSuggestions(results);
+				console.log(results);
+			} else {
+				setSuggestions([]);
+			}
+		};
+		getSuggestions();
+	}, [query]);
 
 	return (
 		<div className='container mt-4'>
