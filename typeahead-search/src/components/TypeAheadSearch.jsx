@@ -5,6 +5,8 @@ import {
 	getListboxProps,
 	getOptionProps,
 } from "../utils/accessibility";
+import { highlightText } from "../utils/highlight";
+import { handleKeyDown } from "../utils/keyboard";
 
 const TypeAheadSearch = () => {
 	const [query, setQuery] = useState("");
@@ -12,19 +14,33 @@ const TypeAheadSearch = () => {
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const [activeIndex, setActiveIndex] = useState(-1);
 	const suggestionsRef = useRef(null);
+	const [error, setError] = useState(""); // Error state
 
 	useEffect(() => {
 		const getSuggestions = async () => {
+			setError(""); // Clear previous errors
 			if (query.length > 0) {
-				const results = await fetchFruits(query);
-				setSuggestions(results);
-				console.log(results);
+				try {
+					const results = await fetchFruits(query);
+					setSuggestions(results);
+					setShowSuggestions(true);
+				} catch (err) {
+					// Handle API error
+					setError("Failed to fetch suggestions. Please try again.");
+					console.error(err); // Log the error for debugging
+				}
 			} else {
 				setSuggestions([]);
+				setShowSuggestions(false);
 			}
 		};
+
 		getSuggestions();
 	}, [query]);
+
+	const handleBlur = () => {
+		setTimeout(() => setShowSuggestions(false), 100);
+	};
 
 	return (
 		<div className='container mt-4'>
@@ -35,16 +51,24 @@ const TypeAheadSearch = () => {
 					placeholder='Search fruits...'
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
-					onBlur={() =>
-						setTimeout(() => setShowSuggestions(false), 100)
-					}
+					onBlur={handleBlur}
 					onFocus={() => query.length > 0 && setShowSuggestions(true)}
+					onKeyDown={(e) =>
+						handleKeyDown(
+							e,
+							suggestions,
+							activeIndex,
+							setActiveIndex,
+							setQuery,
+							setShowSuggestions
+						)
+					}
 					{...getComboboxProps(query, activeIndex, showSuggestions)}
 				/>
-				{console.log(showSuggestions)}
+				{error && <div className='text-danger mt-2'>{error}</div>}{" "}
+				{/* Display error message */}
 				{showSuggestions && suggestions.length > 0 && (
 					<ul
-						id='suggestions-list'
 						className='list-group position-absolute w-100 shadow-sm mt-1'
 						ref={suggestionsRef}
 						{...getListboxProps()}>
@@ -54,8 +78,8 @@ const TypeAheadSearch = () => {
 								className={`list-group-item list-group-item-action ${
 									index === activeIndex ? "active" : ""
 								}`}
-								{...getOptionProps}>
-								{suggestion}
+								{...getOptionProps(index, activeIndex)}>
+								{highlightText(suggestion, query)}
 							</li>
 						))}
 					</ul>
@@ -64,4 +88,5 @@ const TypeAheadSearch = () => {
 		</div>
 	);
 };
+
 export default TypeAheadSearch;
